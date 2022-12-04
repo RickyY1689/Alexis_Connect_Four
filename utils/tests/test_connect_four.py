@@ -15,65 +15,50 @@ class TestConnectFour:
         assert (game.player_one_board == np.zeros((6,7))).all()
         assert (game.player_two_board == np.zeros((6,7))).all()
 
-    def test_make_move(self):
+    @pytest.mark.parametrize("move, expected_res", [
+                                                        [[0],(0, 5)], 
+                                                        [[1],(1, 5)], 
+                                                        [[2],(2, 5)],
+                                                        [[0,0],(0, 4)],
+                                                        [[9],None], # Check illegal move
+                                                        [[-1],None], # Check illegal move
+                                                        [['dummyinputstring'],None] # Check illegal move
+                                                        ])
+    def test_make_move(self,move, expected_res):
         """
         Test that user input is correctly converted to a move, and that the move is valid and applied to the board.
         :return:
         """
         game = ConnectFour()
-        assert game.make_move(game.player_one_board, 0) == (0, 5)
-        assert game.make_move(game.player_one_board, 1) == (1, 5)
-        assert game.make_move(game.player_one_board, 2) == (2, 5)
+        for m in move:
+            ret = game.make_move(game.player_one_board, m)
+            if ret is None:
+                break
+            game.player_one_board[ret[1],ret[0]] = 1
+        assert ret == expected_res
 
-    def test_check_win_condition(self):
+        
+    @pytest.mark.parametrize("moves, expected_res", [
+                                                    [[(0,0),(1,0),(2,0),(3,0)],True], #Check vertical win
+                                                    [[(0,0),(0,1),(0,2),(0,3)],True], #Check horizontal win
+                                                    [[(0,0),(1,1),(2,2),(3,3)],True], #Check diag win
+                                                    [[(0,0),(2,2),(3,3)],False],      #Check impossible board is false
+                                                    [[(0,0),(0,2),(0,3)],False]      #Check impossible board is false
+                                                    ])
+    def test_check_win_condition(self,moves, expected_res):
         """
         Test that the game correctly identifies a set of moves as a win condition
         :return:
         """
+
         game = ConnectFour()
-        game.player_one_board[0][0] = 1
-        game.player_one_board[1][0] = 1
-        game.player_one_board[2][0] = 1
-        game.player_one_board[3][0] = 1
-        assert game.check_win_condition(game.player_one_board) == True
-        game.player_one_board[0][0] = 0
-        game.player_one_board[1][0] = 0
-        game.player_one_board[2][0] = 0
-        game.player_one_board[3][0] = 0
         assert game.check_win_condition(game.player_one_board) == False
+        for move in moves:
+            game.player_one_board[move[0]][move[1]] = 1
 
-    def test_check_horizontal_win(self):
-        """
-        Test that the game identifies a horizontal win condition with a set of horizontal moves.
-        :return:
-        """
-        game = ConnectFour()
-        game.player_one_board[0][0] = 1
-        game.player_one_board[0][1] = 1
-        game.player_one_board[0][2] = 1
-        game.player_one_board[0][3] = 1
-        assert game.check_win_condition(game.player_one_board) == True
+        assert game.check_win_condition(game.player_one_board) == expected_res
+        
 
-    def test_check_diagonal_win(self):
-        """
-        Test that the game identifies a diagonal win condition with a set of diagonal moves.
-        :return:
-        """
-        game = ConnectFour()
-        game.player_one_board[0][0] = 1
-        game.player_one_board[1][1] = 1
-        game.player_one_board[2][2] = 1
-        game.player_one_board[3][3] = 1
-        assert game.check_win_condition(game.player_one_board) == True
-
-    def test_move_selection(self):
-        """
-        Test that an invalid move is rejected and the make_move function returns None
-        :return:
-        """
-        game = ConnectFour()
-        illegal_row = 7
-        assert game.make_move(game.player_one_board, illegal_row) == None
 
     def test_get_merged_board(self):
         """
