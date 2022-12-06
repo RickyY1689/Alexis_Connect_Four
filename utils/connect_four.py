@@ -136,16 +136,18 @@ class ConnectFour():
         turn_counter = 0
         game_over = False
         winning_player = None
+        player1_icon = 'X' # Character in grid to represent player 1, Must be ONE letter character or else grid will be misaligned
+        player2_icon = 'O' # Character in grid to represent player 2, Must be ONE letter character or else grid will be misaligned
         while not game_over:
             merged_board = self.get_merged_board()
             self._clear() #clear terminal so one board exists
-            self.display_board((6,7),merged_board)
+            self.display_board((6,7),merged_board, player1_char=player1_icon, player2_char=player2_icon)
             player = (turn_counter % 2) + 1
             turn_counter += 1
             if player == 1:
-                player_icon = 'X'
+                player_icon = player1_icon
             else:
-                player_icon = 'O'
+                player_icon = player2_icon
             #Ask for player input
             selection = input(f"Player {player} ({player_icon}), select your column (0-6):")
             
@@ -180,7 +182,7 @@ class ConnectFour():
             print("The board has been filled, it's a tie!")
         else:
             merged_board = self.get_merged_board()
-            self.display_board((6,7),merged_board)
+            self.display_board((6,7),merged_board, player1_char=player1_icon, player2_char=player2_icon)
             print(f"Player {winning_player} has won!")
         self.winning_player = winning_player
         return
